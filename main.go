@@ -1,9 +1,14 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/zaccariaaf/gopokedex/repl"
+)
 
 func main() {
 	for {
-		fmt.Println("Test")
+		input := repl.RunRepl(repl.BASE_PROMPT)
+		fmt.Print(input)
 	}
 }
