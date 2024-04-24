@@ -1,34 +1,53 @@
 package repl
 
+import (
+	"errors"
+	"os"
+)
+
 type command struct {
 	name     string
 	usage    string
-	callback func() error
+	Callback func() error
 }
 
-func GetValidCommands() map[string]command {
+func Parse(tokens []string) ([]command, error) {
+	validCommands := getValidCommands()
+	var commands []command
+	for _, token := range tokens {
+		command, ok := validCommands[token]
+		if !ok {
+			printErrorMessage("invalid command:", token)
+			printHelpMesage(validCommands)
+			return nil, errors.New("invalid command")
+		}
+		commands = append(commands, command)
+	}
+	return commands, nil
+}
+
+func getValidCommands() map[string]command {
 	return map[string]command{
 		"help": {
 			name:     "help",
 			usage:    "Displays this help message",
-			callback: commandHelp,
+			Callback: commandHelp,
 		},
 		"exit": {
 			name:     "exit",
 			usage:    "Exit the pokedex",
-			callback: commandExit,
+			Callback: commandExit,
 		},
 	}
 }
 
 func commandHelp() error {
 	printMessage("\nWelcome to the Pokedex!\nUsage:")
-	for _, command := range GetValidCommands() {
-		printCommandHelpText(command.name, command.usage)
-	}
+	printHelpMesage(getValidCommands())
 	return nil
 }
 
 func commandExit() error {
+	os.Exit(0)
 	return nil
 }

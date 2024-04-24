@@ -20,3 +20,6 @@ gopokedex
 
 # Go workspace file
 go.work
+
+# Golang
+.idea/

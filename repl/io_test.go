@@ -10,7 +10,7 @@ import (
 func TestReadToTokens(t *testing.T) {
 	input := "help me"
 	scanner := bufio.NewScanner(strings.NewReader(input))
-	observed := readToTokens(scanner)
+	observed := readNextLine(scanner)
 	expected := []string{"help", "me"}
 
 	if !reflect.DeepEqual(observed, expected) {

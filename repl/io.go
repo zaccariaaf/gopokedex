@@ -4,38 +4,46 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"strings"
 )
 
 const (
-	BASE_PROMPT = "pokedex"
+	BasePrompt = "pokedex"
 )
 
-func RunRepl(prompt string) []string {
+func GetInput(prompt string, tokenChannel chan []string) {
 	scanner := bufio.NewScanner(os.Stdin)
 	printPrompt(prompt)
-	return readToTokens(scanner)
+	nextLine := readNextLine(scanner)
+	tokenChannel <- strings.Split(nextLine, " ")
 }
 
 func printPrompt(prompt string) {
-	fmt.Print("%v> ", prompt)
+	fmt.Printf("%v> ", prompt)
 }
 
 func printMessage(message string) {
-	fmt.Printf(message)
+	fmt.Print(message)
+}
+
+func printErrorMessage(message string, args ...string) {
+	fmt.Fprintln(os.Stderr, message, args)
+}
+
+func printHelpMesage(validCommands map[string]command) {
+	for _, command := range validCommands {
+		printCommandHelpText(command.name, command.usage)
+	}
 }
 
 func printCommandHelpText(command, usage string) {
-	fmt.Println("%v:	%v", command, usage)
+	fmt.Printf("%v:	%v\n", command, usage)
 }
 
-func readToTokens(scanner *bufio.Scanner) []string {
-	tokens := []string{}
-	scanner.Split(bufio.ScanWords)
-	for scanner.Scan() {
-		tokens = append(tokens, scanner.Text())
-	}
+func readNextLine(scanner *bufio.Scanner) string {
+	scanner.Scan()
 	if err := scanner.Err(); err != nil {
 		fmt.Fprintln(os.Stderr, "reading standard input:", err)
 	}
-	return tokens
+	return scanner.Text()
 }
